@@ -12,6 +12,7 @@ RUN apk update && \
     apk add --no-cache gcc musl-dev && \
     pip install --no-cache-dir gunicorn
 
+# Install Python dependencies from requirements
 RUN pip install --no-cache-dir -r dependencies.txt
 
 # Copy the entire project into the container
@@ -25,6 +26,13 @@ RUN chmod +x /wait-for-sqlite.sh
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Set environment variables
+ARG DJANGO_SECRET_KEY
+ARG FRONTEND_URL
+ENV DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+ENV FRONTEND_URL=${FRONTEND_URL}
+
+# Run Django collectstatic command
 RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
